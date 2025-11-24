@@ -1,0 +1,390 @@
+<!DOCTYPE html>
+<html lang="es">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Tienda-CRUD</title>
+
+        <link rel="stylesheet" href="css/styles.css" />
+
+        <!-- Materialize css -->
+        <link
+            rel="stylesheet"
+            href="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/css/materialize.min.css"
+        />
+
+        <!-- Iconos -->
+        <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet" />
+    </head>
+    <body>
+        <!-- Navbar -->
+        <nav class="white">
+            <div class="nav-wrapper container">
+                <!-- Logo de la tienda -->
+                <a href="#" class="brand-logo left black-text"> <i class="material-icons left">store</i>Tienda-CRUD </a>
+
+                <ul class="right">
+                    <!-- Boton de login -->
+                    <li id="btnLoginLi">
+                        <a class="btn blue darken-3 waves-effect waves-light modal-trigger" href="#modalLogin">
+                            ADMIN LOGIN
+                        </a>
+                    </li>
+                    <!-- Boton para cerrar sesion de administrador -->
+                    <li id="btnLogoutLi" style="display: none">
+                        <a class="btn red darken-2 waves-effect waves-light" id="btn_cerrarSesion">
+                            <i class="material-icons left">exit_to_app</i>SALIR
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        </nav>
+
+        <!-- Pantalla de carga -->
+        <div id="loadingOverlay" class="loading-overlay" style="display: none">
+            <div class="preloader-wrapper big active">
+                <div class="spinner-layer spinner-blue-only">
+                    <div class="circle-clipper left"><div class="circle"></div></div>
+                    <div class="gap-patch"><div class="circle"></div></div>
+                    <div class="circle-clipper right"><div class="circle"></div></div>
+                </div>
+            </div>
+            <h5 id="loadingText">Cargando...</h5>
+        </div>
+
+        <!-- Panel de control del administrador -->
+        <div id="adminPanelContainer" class="container" style="margin-top: 30px">
+            <div class="card">
+                <!-- Titulo -->
+                <div class="header-card">
+                    <h4><i class="material-icons left">dashboard</i> Panel de Control</h4>
+                    <p>Administrador del inventario de productos</p>
+                </div>
+
+                <div class="card-content">
+                    <!-- Boton para agregar producto -->
+                    <button
+                        class="btn orange darken-1 waves-effect waves-light btn-large"
+                        id="btn_abrirModalAgregar"
+                        style="width: 100%; max-width: 300px; margin-bottom: 25px"
+                    >
+                        <i class="material-icons left">add_circle</i> AGREGAR PRODUCTO
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Opciones de busqueda -->
+        <div class="container" style="margin-top: 30px">
+            <div class="card">
+                <!-- Encabezado -->
+                <div class="header-card">
+                    <h4><i class="material-icons left">storefront</i>Buscar en el Catálogo</h4>
+                </div>
+
+                <div class="card-content">
+                    <div class="row">
+                        <!-- Barra de busqueda -->
+                        <div class="input-field col s12 m4">
+                            <i class="material-icons prefix">search</i>
+                            <input type="text" id="busqueda" class="autocomplete" />
+                            <label for="busqueda">Buscar productos...</label>
+                        </div>
+
+                        <!-- Filtro de categorias -->
+                        <div class="input-field col s12 m4">
+                            <i class="material-icons prefix">filter_list</i>
+                            <select id="filtroCategoria">
+                                <option value="todos" selected>Todas las categorías</option>
+                                <option value="Tecnología">Tecnología</option>
+                                <option value="Ropa">Ropa</option>
+                                <option value="Hogar">Hogar</option>
+                                <option value="Deportes">Deportes</option>
+                            </select>
+                            <label>Filtrar por Categoría</label>
+                        </div>
+
+                        <!-- Ordenar por -->
+                        <div class="input-field col s12 m4">
+                            <i class="material-icons prefix">sort</i>
+                            <select id="ordenamiento">
+                                <option value="nombre_asc" selected>Nombre (A-Z)</option>
+                                <option value="nombre_desc">Nombre (Z-A)</option>
+                                <option value="precio_asc">Precio (Menor a Mayor)</option>
+                                <option value="precio_desc">Precio (Mayor a Menor)</option>
+                            </select>
+                            <label>Ordenar por</label>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Lista de productos -->
+        <div class="container" style="margin-top: 30px">
+            <div id="listaProductos" class="row"></div>
+        </div>
+
+        <!-- Boton flotante del carrito de compras -->
+        <div class="fixed-action-btn cart-fab" id="btn_abrirCarrito">
+            <a class="btn-floating btn-large orange darken-2 pulse">
+                <i class="large material-icons">shopping_cart</i>
+            </a>
+            <span class="cart-badge" id="cartCount">0</span>
+        </div>
+
+        <!-- Efecto de onda -->
+        <div style="height: 150px; overflow: hidden; margin-bottom: -10px">
+            <svg viewBox="0 0 500 150" preserveAspectRatio="none" style="height: 100%; width: 100%">
+                <path
+                    d="M0.00,49.98 C149.99,150.00 349.20,-49.98 500.00,49.98 L500.00,150.00 L0.00,150.00 Z"
+                    style="stroke: none; fill: #212121"
+                ></path>
+            </svg>
+        </div>
+
+        <!-- Footer -->
+        <footer class="page-footer grey darken-4">
+            <div class="container">
+                <div class="row">
+                    <div class="col l6 s12">
+                        <h5 class="white-text" style="display: flex; align-items: center">
+                            <i class="material-icons orange-text text-darken-2" style="margin-right: 10px">store</i>
+                            Tienda-CRUD
+                        </h5>
+                        <p class="grey-text text-lighten-4">
+                            La mejor tecnología y productos a tu alcance. Administramos calidad, entregamos felicidad.
+                        </p>
+
+                        <div style="margin-top: 20px">
+                            <a class="btn-floating btn-small transparent z-depth-0 waves-effect"
+                                ><i class="material-icons white-text">facebook</i></a
+                            >
+                            <a class="btn-floating btn-small transparent z-depth-0 waves-effect"
+                                ><i class="material-icons white-text">camera_alt</i></a
+                            >
+                            <a class="btn-floating btn-small transparent z-depth-0 waves-effect"
+                                ><i class="material-icons white-text">alternate_email</i></a
+                            >
+                        </div>
+                    </div>
+
+                    <div class="col l4 offset-l2 s12">
+                        <h5 class="white-text">Enlaces Rápidos</h5>
+                        <ul>
+                            <li>
+                                <a class="grey-text text-lighten-3 hover-line" href="#!" id="footer_abrirCarrito"
+                                    >Ver Carrito</a
+                                >
+                            </li>
+                            <li>
+                                <a class="grey-text text-lighten-3 hover-line modal-trigger" href="#modalLogin"
+                                    >Zona Admin</a
+                                >
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <div class="footer-copyright black">
+                <div class="container center-align grey-text text-darken-1">
+                    2025 Tienda-CRUD - Diseñado por JEGC y SCD
+                </div>
+            </div>
+        </footer>
+
+        <style>
+            /* Efecto hover simple para los enlaces del footer */
+            .hover-line {
+                text-decoration: none;
+                position: relative;
+                transition: color 0.3s;
+            }
+            .hover-line:hover {
+                color: #f57c00 !important;
+                padding-left: 5px;
+            }
+        </style>
+        <!-- FIN DEL CONTENIDO FIJO -->
+
+        <!-- PANTALLAS Y MENUS EMERGENTES -->
+        <!-- Pantalla emergente del carrito -->
+        <div id="modalCarrito" class="modal modal-fixed-footer">
+            <div class="modal-content">
+                <h4><i class="material-icons left">shopping_cart</i> Tu Carrito</h4>
+                <ul id="listaCarrito"></ul>
+                <div class="row right-align">
+                    <h5>Total: <span class="green-text" id="cartTotal">$0.00</span></h5>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <a href="#!" class="modal-close btn-flat">Seguir viendo</a>
+                <a href="#!" class="btn orange darken-2" id="btn_finalizarCompra">
+                    <i class="material-icons left">whatsapp</i>Pedir
+                </a>
+            </div>
+        </div>
+
+        <!-- Menu para iniciar sesion -->
+        <div id="modalLogin" class="modal" style="border-radius: 15px; max-width: 380px; overflow: visible">
+            <div class="modal-content" style="padding: 30px 24px 10px 24px">
+                <h4 class="center-align" style="color: #1976d2; margin-top: 0; font-weight: 400">
+                    Acceso Administrativo
+                </h4>
+
+                <form style="margin-top: 30px">
+                    <!-- Nombre -->
+                    <div class="input-field">
+                        <i class="material-icons prefix" style="color: #333">person</i>
+                        <input type="text" id="loginUser" placeholder="admin" />
+                        <label for="loginUser" class="active">Nombre de Usuario</label>
+                    </div>
+
+                    <!-- Contraseña -->
+                    <div class="input-field" style="margin-top: 20px">
+                        <i class="material-icons prefix" style="color: #333">lock</i>
+                        <input type="password" id="loginPass" placeholder="••••••" />
+                        <label for="loginPass" class="active">Contraseña</label>
+                        <i
+                            class="material-icons"
+                            id="btn_togglePassword"
+                            style="position: absolute; right: 0; top: 10px; cursor: pointer; color: #333"
+                        >
+                            visibility_off
+                        </i>
+                    </div>
+                </form>
+            </div>
+
+            <!-- Boton para iniciar sesion -->
+            <div class="modal-footer" style="padding: 0; height: 50px; border-radius: 20px">
+                <a
+                    id="btn_iniciarSesion"
+                    class="waves-effect waves-light btn-flat blue darken-2 white-text"
+                    style="
+                        width: 100%;
+                        height: 100%;
+                        border-radius: 0 0 15px 15px;
+                        display: flex;
+                        align-items: center;
+                        justify-content: center;
+                        font-weight: bold;
+                        letter-spacing: 1px;
+                    "
+                >
+                    <i class="material-icons left" style="margin-right: 10px">vpn_key</i> ENTRAR
+                </a>
+            </div>
+        </div>
+
+        <!-- Menu para agregar un nuevo producto -->
+        <div id="modalProducto" class="modal modal-fixed-footer" style="max-width: 700px">
+            <div class="modal-content">
+                <h4 id="modalTitulo">Gestión de Producto</h4>
+                <form id="formProducto">
+                    <div class="row">
+                        <!-- Nombre -->
+                        <div class="input-field col s12 m6">
+                            <i class="material-icons prefix">label</i>
+                            <input type="text" id="nombre" />
+                            <label for="nombre">Nombre</label>
+                        </div>
+                        <!-- Precio -->
+                        <div class="input-field col s12 m6">
+                            <i class="material-icons prefix">attach_money</i>
+                            <input type="number" id="precio" />
+                            <label for="precio">Precio ($)</label>
+                        </div>
+                        <!-- Categoria -->
+                        <div class="input-field col s12 m6">
+                            <i class="material-icons prefix">category</i>
+                            <select id="categoria">
+                                <option value="" disabled selected>Elige una categoría</option>
+                                <!-- Lista de categorias -->
+                                <option value="Tecnología">Tecnología</option>
+                                <option value="Ropa">Ropa</option>
+                                <option value="Hogar">Hogar</option>
+                                <option value="Deportes">Deportes</option>
+                            </select>
+                            <label>Categoría</label>
+                        </div>
+                        <!-- Stock -->
+                        <div class="input-field col s12 m6">
+                            <input type="number" id="stock" />
+                            <label for="stock">Stock</label>
+                        </div>
+                        <!-- Descripcion del producto -->
+                        <div class="input-field col s12">
+                            <textarea id="descripcion" class="materialize-textarea"></textarea>
+                            <label for="descripcion">Descripción</label>
+                        </div>
+                        <!-- Entrada para las imagenes del producto -->
+                        <div class="col s12">
+                            <h6>Imágenes del producto</h6>
+                            <div class="row valign-wrapper">
+                                <div class="input-field col s10">
+                                    <i class="material-icons prefix">image</i>
+                                    <input type="url" id="tempImgUrl" placeholder="https://ejemplo.com/foto.jpg" />
+                                    <label for="tempImgUrl">Pegar URL de imagen</label>
+                                </div>
+                                <div class="col s2">
+                                    <button type="button" class="btn-floating green" id="btnAgregarUrl">
+                                        <i class="material-icons">add</i>
+                                    </button>
+                                </div>
+                            </div>
+                            <ul id="listaUrlsImagenes" class="collection"></ul>
+                        </div>
+                    </div>
+                </form>
+            </div>
+
+            <!-- Botones -->
+            <div class="modal-footer">
+                <a href="#!" class="modal-close btn-flat">Cancelar</a>
+                <a href="#!" class="btn green" id="btn_guardarProducto">
+                    <i class="material-icons left">save</i>Guardar
+                </a>
+            </div>
+        </div>
+
+        <!-- Pantalla para mostrar detalles del producto seleccionado -->
+        <div id="modalDetalle" class="modal modal-fixed-footer">
+            <div class="modal-content">
+                <div class="row">
+                    <div class="col s12 m6">
+                        <!-- Carousel -->
+                        <div
+                            class="carousel carousel-slider center"
+                            id="carruselProducto"
+                            style="height: 300px; border-radius: 8px"
+                        ></div>
+                    </div>
+                    <div class="col s12 m6">
+                        <!-- Nombre del producto -->
+                        <h4 id="detalleNombre"></h4>
+                        <!-- Precio -->
+                        <h5 class="green-text" id="detallePrecio"></h5>
+                        <!-- Categoria -->
+                        <div class="chip blue lighten-4" id="detalleCategoria"></div>
+                        <!-- Stock -->
+                        <div class="chip orange lighten-4" id="detalleStock"></div>
+                        <!-- Descripcion -->
+                        <p id="detalleDescripcion" style="margin-top: 20px; font-size: 1.1rem"></p>
+                    </div>
+                </div>
+            </div>
+            <!-- Botones -->
+            <div class="modal-footer">
+                <a href="#!" class="modal-close btn-flat">Cerrar</a>
+                <a class="btn orange darken-2" id="btnAgregarDesdeDetalle">
+                    <i class="material-icons left">add_shopping_cart</i>Agregar al Carrito
+                </a>
+            </div>
+        </div>
+
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/js/materialize.min.js"></script>
+        <script type="module" src="js/app.js"></script>
+    </body>
+</html>
